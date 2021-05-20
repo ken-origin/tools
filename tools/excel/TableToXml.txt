@@ -1,0 +1,54 @@
+Sub TableToXML()
+    Dim tableName As String
+    tableName = "TABLE_NAME"
+    
+    Dim space As String
+    space = "    "
+    
+    Dim rows As Collection
+    Set rows = New Collection
+ 
+    Dim select_i As Integer
+    For select_i = 1 To Selection.rows.Count
+        Dim row As Collection
+        Set row = New Collection
+        Dim select_j As Integer
+        For select_j = 1 To Selection.Columns.Count
+            row.Add Selection(1).Offset(select_i - 1, select_j - 1).Value
+        Next
+        rows.Add row
+    Next
+    
+    Worksheets("Result").Cells.Clear
+    
+    
+    Dim i As Integer
+    i = 0
+    For Each rw In rows
+        i = i + 1
+        If i = 1 Then
+            GoTo Continue
+        End If
+        
+        Dim outputRow As String
+        outputRow = space & "<" & tableName
+        
+        
+        Dim j As Integer
+        j = 0
+        For Each r In rw
+            j = j + 1
+            Dim colName As String
+            Dim headRow As Collection
+            Set headRow = rows(1)
+            colName = headRow(j)
+            outputRow = outputRow & " " & colName & "=" & """" & r & """"
+        Next r
+        
+        outputRow = outputRow & "/>"
+        
+        Worksheets("Result").Cells(i - 1, 1).Value = outputRow
+Continue:
+    Next rw
+    
+End Sub
