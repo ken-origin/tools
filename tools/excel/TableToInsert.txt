@@ -1,0 +1,73 @@
+Sub TableToInsert()
+    Dim tableName As String
+    tableName = UCase("TABLE_NAME")
+    
+    Dim space As String
+    space = "    "
+    
+    Dim rows As Collection
+    Set rows = New Collection
+ 
+    Dim select_i As Integer
+    For select_i = 1 To Selection.rows.Count
+        Dim row As Collection
+        Set row = New Collection
+        Dim select_j As Integer
+        For select_j = 1 To Selection.Columns.Count
+            row.Add Selection(1).Offset(select_i - 1, select_j - 1).Value
+        Next
+        rows.Add row
+    Next
+    
+    Worksheets("Result").Cells.Clear
+    
+    
+    Dim INSERT_PREFIX As String
+    INSERT_PREFIX = "INSERT INTO " & tableName & " "
+    
+    Dim INSERT_COLS As String
+    
+    
+    Dim i As Integer
+    i = 0
+    For Each rw In rows
+        i = i + 1
+        If i = 1 Then
+            INSERT_COLS = "("
+            Dim k As Integer
+            k = 0
+            For Each r In rw
+                k = k + 1
+                If k = 1 Then
+                    INSERT_COLS = INSERT_COLS & UCase(r)
+                Else
+                    INSERT_COLS = INSERT_COLS & ", " & UCase(r)
+                End If
+                
+            Next r
+            INSERT_COLS = INSERT_COLS & ")"
+            GoTo Continue
+        End If
+        
+        Dim INSERT_VALUES As String
+        INSERT_VALUES = " VALUES ("
+      
+        
+        Dim j As Integer
+        j = 0
+        For Each r In rw
+            j = j + 1
+            If j = 1 Then
+                INSERT_VALUES = INSERT_VALUES & "'" & r & "'"
+            Else
+                INSERT_VALUES = INSERT_VALUES & ", " & "'" & r & "'"
+            End If
+        Next r
+        
+        INSERT_VALUES = INSERT_VALUES & ")" & ";"
+        
+        Worksheets("Result").Cells(i - 1, 1).Value = INSERT_PREFIX & INSERT_COLS & INSERT_VALUES
+Continue:
+    Next rw
+    
+End Sub

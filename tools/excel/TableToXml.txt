@@ -1,6 +1,6 @@
 Sub TableToXML()
     Dim tableName As String
-    tableName = "TABLE_NAME"
+    tableName = UCase("TABLE_NAME")
     
     Dim space As String
     space = "    "
@@ -42,7 +42,7 @@ Sub TableToXML()
             Dim headRow As Collection
             Set headRow = rows(1)
             colName = headRow(j)
-            outputRow = outputRow & " " & colName & "=" & """" & r & """"
+            outputRow = outputRow & " " & UCase(colName) & "=" & """" & r & """"
         Next r
         
         outputRow = outputRow & "/>"
