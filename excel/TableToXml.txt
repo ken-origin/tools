@@ -8,11 +8,11 @@ Sub TableToXML()
     Dim rows As Collection
     Set rows = New Collection
  
-    Dim select_i As Integer
+    Dim select_i As Long
     For select_i = 1 To Selection.rows.Count
         Dim row As Collection
         Set row = New Collection
-        Dim select_j As Integer
+        Dim select_j As Long
         For select_j = 1 To Selection.Columns.Count
             row.Add Selection(1).Offset(select_i - 1, select_j - 1).Value
         Next
@@ -22,7 +22,7 @@ Sub TableToXML()
     Worksheets("Result").Cells.Clear
     
     
-    Dim i As Integer
+    Dim i As Long
     i = 0
     For Each rw In rows
         i = i + 1
@@ -34,7 +34,7 @@ Sub TableToXML()
         outputRow = space & "<" & tableName
         
         
-        Dim j As Integer
+        Dim j As Long
         j = 0
         For Each r In rw
             j = j + 1

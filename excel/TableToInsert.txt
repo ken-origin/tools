@@ -8,7 +8,7 @@ Sub TableToInsert()
     Dim rows As Collection
     Set rows = New Collection
  
-    Dim select_i As Integer
+    Dim select_i As Long
     For select_i = 1 To Selection.rows.Count
         Dim row As Collection
         Set row = New Collection
@@ -28,14 +28,14 @@ Sub TableToInsert()
     Dim INSERT_COLS As String
     
     
-    Dim i As Integer
+    Dim i As Long
     i = 0
     For Each rw In rows
         i = i + 1
         If i = 1 Then
             If rw(1) <> "" Then
                 INSERT_COLS = "("
-                Dim k As Integer
+                Dim k As Long
                 k = 0
                 For Each r In rw
                     k = k + 1
@@ -55,7 +55,7 @@ Sub TableToInsert()
         INSERT_VALUES = "VALUES ("
       
         
-        Dim j As Integer
+        Dim j As Long
         j = 0
         For Each r In rw
             j = j + 1
