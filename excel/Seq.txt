@@ -1,0 +1,47 @@
+Sub Seq()
+    Dim src_s As String
+    src_s = Cells(2, 1).Value
+    
+    Dim start_i As Integer
+    start_i = Cells(2, 2).Value
+    
+    Dim end_i As Integer
+    end_i = Cells(2, 3).Value
+    
+    Dim step_i As Integer
+    If Cells(2, 4).Value = "" Or Cells(2, 4).Value = "0" Then
+        step_i = 1
+    Else
+        step_i = Cells(2, 4).Value
+    End If
+    
+    Dim zero_i As Integer
+    If Cells(2, 5).Value = "" Or Cells(2, 5).Value = "0" Then
+        zero_i = 1
+    Else
+        zero_i = Cells(2, 5).Value
+    End If
+    
+    Worksheets("Result").Cells.Clear
+    
+    Dim outputList As Collection
+    Set outputList = New Collection
+    
+    For start_i = start_i To end_i Step step_i
+        Dim r_no As String
+        r_no = CStr(start_i)
+        Dim zi As Integer
+        For zi = 1 To zero_i
+            If Len(r_no) < zero_i Then
+                r_no = "0" & r_no
+            End If
+        Next
+        outputList.Add src_s & r_no
+    Next
+    
+    Dim i As Integer
+    For i = 1 To outputList.Count
+        Worksheets("Result").Cells(i, 1).Value = outputList(i)
+    Next
+        
+End Sub
