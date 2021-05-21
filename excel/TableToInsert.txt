@@ -33,24 +33,26 @@ Sub TableToInsert()
     For Each rw In rows
         i = i + 1
         If i = 1 Then
-            INSERT_COLS = "("
-            Dim k As Integer
-            k = 0
-            For Each r In rw
-                k = k + 1
-                If k = 1 Then
-                    INSERT_COLS = INSERT_COLS & UCase(r)
-                Else
-                    INSERT_COLS = INSERT_COLS & ", " & UCase(r)
-                End If
+            If rw(1) <> "" Then
+                INSERT_COLS = "("
+                Dim k As Integer
+                k = 0
+                For Each r In rw
+                    k = k + 1
+                    If k = 1 Then
+                        INSERT_COLS = INSERT_COLS & UCase(r)
+                    Else
+                        INSERT_COLS = INSERT_COLS & ", " & UCase(r)
+                    End If
                 
-            Next r
-            INSERT_COLS = INSERT_COLS & ")"
+                Next r
+                INSERT_COLS = INSERT_COLS & ")" & " "
+            End If
             GoTo Continue
         End If
         
         Dim INSERT_VALUES As String
-        INSERT_VALUES = " VALUES ("
+        INSERT_VALUES = "VALUES ("
       
         
         Dim j As Integer
