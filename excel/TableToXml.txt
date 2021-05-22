@@ -1,6 +1,41 @@
-Sub TableToXML()
-    Dim tableName As String
-    tableName = UCase("TABLE_NAME")
+Sub ShowForm()
+    '// フォームを開く
+    TableToXmlForm.Show vbModeless
+End Sub
+
+Sub Test()
+    Dim TableName As String
+    Dim IsColumn As Boolean
+    Dim IsTableUpperCase As Boolean
+    Dim IsTableLowerCase As Boolean
+    Dim IsColumnUpperCase As Boolean
+    Dim IsColumnLowerCase As Boolean
+    
+    '// マクロからの呼び出し設定デフォルト値
+    TableName = "dummy_table"
+    IsColumn = True
+    IsTableUpperCase = True
+    IsTableLowerCase = False
+    IsColumnUpperCase = True
+    IsColumnLowerCase = False
+    
+    '// メイン処理呼び出し
+    Call Execute(TableName, IsColumn, IsTableUpperCase, IsTableLowerCase, IsColumnUpperCase, IsColumnLowerCase)
+End Sub
+
+Sub Execute(ByVal TableName As String, ByVal IsColumn As Boolean, ByVal IsTableUpperCase As Boolean, ByVal IsTableLowerCase As Boolean, ByVal IsColumnUpperCase As Boolean, ByVal IsColumnLowerCase As Boolean)
+
+    If TableName = "" Then
+        TableName = "dummy_table"
+    End If
+    
+    Select Case True
+        Case IsTableUpperCase
+            TableName = UCase(TableName)
+        Case IsTableLowerCase
+            TableName = LCase(TableName)
+        Case Else
+    End Select
     
     Dim space As String
     space = "    "
@@ -19,35 +54,75 @@ Sub TableToXML()
         rows.Add row
     Next
     
-    Worksheets("Result").Cells.Clear
     
+    Dim ws As Worksheet
+    Dim isSheetNameFlg As Boolean
+    For Each ws In Worksheets
+        If UCase(ws.Name) = UCase(TableName) Then
+            isSheetNameFlg = True
+        End If
+    Next ws
+    
+    '// 既に同名のシートが存在する場合、削除してから同名の新規シート作成(結果が上書きになる)
+    If isSheetNameFlg Then
+        '// Worksheets(TableName).Cells.Clear
+        Application.DisplayAlerts = False ' メッセージを非表示
+        Worksheets(TableName).Delete
+        Application.DisplayAlerts = True  ' メッセージを表示
+    End If
+    '// テーブル名のシートを追加
+    Worksheets.Add.Name = TableName
+    '// 追加したシートを末尾に移動
+    Worksheets(TableName).Move After:=Worksheets(Worksheets.Count)
     
     Dim i As Long
     i = 0
     For Each rw In rows
         i = i + 1
-        If i = 1 Then
-            GoTo Continue
+        
+        If IsColumn Then
+            If i = 1 Then
+                GoTo Continue
+            End If
         End If
-        
+       
         Dim outputRow As String
-        outputRow = space & "<" & tableName
-        
+        outputRow = space & "<" & TableName
         
         Dim j As Long
         j = 0
         For Each r In rw
             j = j + 1
+            
             Dim colName As String
+            colName = "dummy_col_" & j
+            
             Dim headRow As Collection
             Set headRow = rows(1)
-            colName = headRow(j)
-            outputRow = outputRow & " " & UCase(colName) & "=" & """" & r & """"
+            
+            If IsColumn Then
+                colName = headRow(j)
+            End If
+            
+            Select Case True
+                Case IsColumnUpperCase
+                    colName = UCase(colName)
+                Case IsColumnLowerCase
+                    colName = LCase(colName)
+                Case Else
+            End Select
+            
+            outputRow = outputRow & " " & colName & "=" & """" & r & """"
         Next r
         
         outputRow = outputRow & "/>"
         
-        Worksheets("Result").Cells(i - 1, 1).Value = outputRow
+        If IsColumn Then
+            Worksheets(TableName).Cells(i - 1, 1).Value = outputRow
+        Else
+            Worksheets(TableName).Cells(i, 1).Value = outputRow
+        End If
+        
 Continue:
     Next rw
     
