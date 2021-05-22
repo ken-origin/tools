@@ -1,9 +1,41 @@
-Sub TableToInsert()
-    Dim tableName As String
-    tableName = UCase("TABLE_NAME")
+Sub ShowForm()
+    '// フォームを開く
+    TableToInsertForm.Show vbModeless
+End Sub
+
+Sub Test()
+    Dim TableName As String
+    Dim IsColumn As Boolean
+    Dim IsTableUpperCase As Boolean
+    Dim IsTableLowerCase As Boolean
+    Dim IsColumnUpperCase As Boolean
+    Dim IsColumnLowerCase As Boolean
     
-    Dim space As String
-    space = "    "
+    '// マクロからの呼び出し設定デフォルト値
+    TableName = "dummy_table"
+    IsColumn = True
+    IsTableUpperCase = True
+    IsTableLowerCase = False
+    IsColumnUpperCase = True
+    IsColumnLowerCase = False
+    
+    '// メイン処理呼び出し
+    Call Execute(TableName, IsColumn, IsTableUpperCase, IsTableLowerCase, IsColumnUpperCase, IsColumnLowerCase)
+End Sub
+
+Sub Execute(ByVal TableName As String, ByVal IsColumn As Boolean, ByVal IsTableUpperCase As Boolean, ByVal IsTableLowerCase As Boolean, ByVal IsColumnUpperCase As Boolean, ByVal IsColumnLowerCase As Boolean)
+    
+    If TableName = "" Then
+        TableName = "dummy_table"
+    End If
+    
+    Select Case True
+        Case IsTableUpperCase
+            TableName = UCase(TableName)
+        Case IsTableLowerCase
+            TableName = LCase(TableName)
+        Case Else
+    End Select
     
     Dim rows As Collection
     Set rows = New Collection
@@ -19,37 +51,63 @@ Sub TableToInsert()
         rows.Add row
     Next
     
-    Worksheets("Result").Cells.Clear
+    Dim ws As Worksheet
+    Dim isSheetNameFlg As Boolean
+    For Each ws In Worksheets
+        If UCase(ws.Name) = UCase(TableName) Then
+            isSheetNameFlg = True
+        End If
+    Next ws
+    
+    '// 既に同名のシートが存在する場合、削除してから同名の新規シート作成(結果が上書きになる)
+    If isSheetNameFlg Then
+        '// Worksheets(TableName).Cells.Clear
+        Application.DisplayAlerts = False ' メッセージを非表示
+        Worksheets(TableName).Delete
+        Application.DisplayAlerts = True  ' メッセージを表示
+    End If
+    '// テーブル名のシートを追加
+    Worksheets.Add.Name = TableName
+    '// 追加したシートを末尾に移動
+    Worksheets(TableName).Move After:=Worksheets(Worksheets.Count)
     
     
     Dim INSERT_PREFIX As String
-    INSERT_PREFIX = "INSERT INTO " & tableName & " "
+    INSERT_PREFIX = "INSERT INTO " & TableName & " "
     
     Dim INSERT_COLS As String
-    
     
     Dim i As Long
     i = 0
     For Each rw In rows
         i = i + 1
-        If i = 1 Then
-            If rw(1) <> "" Then
+        If IsColumn Then
+            If i = 1 Then
                 INSERT_COLS = "("
                 Dim k As Long
                 k = 0
                 For Each r In rw
                     k = k + 1
+                    Dim column As String
+                    Select Case True
+                        Case IsColumnUpperCase
+                            column = UCase(r)
+                        Case IsColumnLowerCase
+                            column = LCase(r)
+                        Case selse
+                            column = r
+                    End Select
                     If k = 1 Then
-                        INSERT_COLS = INSERT_COLS & UCase(r)
+                        INSERT_COLS = INSERT_COLS & column
                     Else
-                        INSERT_COLS = INSERT_COLS & ", " & UCase(r)
+                        INSERT_COLS = INSERT_COLS & ", " & column
                     End If
-                
                 Next r
                 INSERT_COLS = INSERT_COLS & ")" & " "
+                GoTo Continue
             End If
-            GoTo Continue
         End If
+
         
         Dim INSERT_VALUES As String
         INSERT_VALUES = "VALUES ("
@@ -57,18 +115,25 @@ Sub TableToInsert()
         
         Dim j As Long
         j = 0
+        Dim colValue As String
         For Each r In rw
             j = j + 1
+            colValue = r
             If j = 1 Then
-                INSERT_VALUES = INSERT_VALUES & "'" & r & "'"
+                INSERT_VALUES = INSERT_VALUES & "'" & colValue & "'"
             Else
-                INSERT_VALUES = INSERT_VALUES & ", " & "'" & r & "'"
+                INSERT_VALUES = INSERT_VALUES & ", " & "'" & colValue & "'"
             End If
         Next r
         
         INSERT_VALUES = INSERT_VALUES & ")" & ";"
         
-        Worksheets("Result").Cells(i - 1, 1).Value = INSERT_PREFIX & INSERT_COLS & INSERT_VALUES
+        If IsColumn Then
+            Worksheets(TableName).Cells(i - 1, 1).Value = INSERT_PREFIX & INSERT_COLS & INSERT_VALUES
+        Else
+            Worksheets(TableName).Cells(i, 1).Value = INSERT_PREFIX & INSERT_VALUES
+        End If
+        
 Continue:
     Next rw
     
