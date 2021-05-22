@@ -55,25 +55,29 @@ Sub Execute(ByVal TableName As String, ByVal IsColumn As Boolean, ByVal IsTableU
     Next
     
     
-    Dim ws As Worksheet
-    Dim isSheetNameFlg As Boolean
-    For Each ws In Worksheets
-        If UCase(ws.Name) = UCase(TableName) Then
-            isSheetNameFlg = True
-        End If
-    Next ws
+    '// 結果出力ワークシート名
+    Dim resultWorkSheetName As String
+    resultWorkSheetName = TableName & "_" & "I"
+       
+    '// シート名存在チェック
+    Dim isWorkSheetNameFlg As Boolean
+    isWorkSheetNameFlg = IsWorkSheetName(resultWorkSheetName)
+        
+    If isWorkSheetNameFlg And Worksheets.Count = 1 Then
+        MsgBox "やめてください。"
+        Exit Sub
+    End If
     
-    '// 既に同名のシートが存在する場合、削除してから同名の新規シート作成(結果が上書きになる)
-    If isSheetNameFlg Then
-        '// Worksheets(TableName).Cells.Clear
+    If isWorkSheetNameFlg Then
         Application.DisplayAlerts = False ' メッセージを非表示
-        Worksheets(TableName).Delete
+        Worksheets(resultWorkSheetName).Delete
         Application.DisplayAlerts = True  ' メッセージを表示
     End If
+    
     '// テーブル名のシートを追加
-    Worksheets.Add.Name = TableName
+    Worksheets.Add.Name = resultWorkSheetName
     '// 追加したシートを末尾に移動
-    Worksheets(TableName).Move After:=Worksheets(Worksheets.Count)
+    Worksheets(resultWorkSheetName).Move After:=Worksheets(Worksheets.Count)
     
     Dim i As Long
     i = 0
@@ -118,12 +122,24 @@ Sub Execute(ByVal TableName As String, ByVal IsColumn As Boolean, ByVal IsTableU
         outputRow = outputRow & "/>"
         
         If IsColumn Then
-            Worksheets(TableName).Cells(i - 1, 1).Value = outputRow
+            Worksheets(resultWorkSheetName).Cells(i - 1, 1).Value = outputRow
         Else
-            Worksheets(TableName).Cells(i, 1).Value = outputRow
+            Worksheets(resultWorkSheetName).Cells(i, 1).Value = outputRow
         End If
         
 Continue:
     Next rw
     
 End Sub
+
+Function IsWorkSheetName(ByVal WorkSheetName As String)
+    Dim ws As Worksheet
+    Dim isWorkSheetNameFlg As Boolean
+    For Each ws In Worksheets
+        If UCase(ws.Name) = UCase(WorkSheetName) Then
+            isWorkSheetNameFlg = True
+        End If
+    Next ws
+    IsWorkSheetName = isWorkSheetNameFlg
+End Function
+
