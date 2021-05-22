@@ -58,6 +58,9 @@ Sub Execute(ByVal TableName As String, ByVal IsColumn As Boolean, ByVal IsTableU
     Dim resultWorkSheetName As String
     resultWorkSheetName = TableName & RESULT_SHEET_SUFFIX
     
+    '// 禁則文字の削除
+    resultWorkSheetName = DeleteIllegalChar(resultWorkSheetName)
+    
     '// シート名が最大長の31文字を超える場合、「31 - シート名の桁数」文字分、テーブル名の末尾の文字を削除する。
     If Len(resultWorkSheetName) > 31 Then
         resultWorkSheetName = Left(TableName, Len(TableName) - (Len(resultWorkSheetName) - 31)) & RESULT_SHEET_SUFFIX
@@ -151,13 +154,24 @@ Continue:
 End Sub
 
 
-Function IsWorkSheetName(ByVal WorkSheetName As String)
+Function IsWorkSheetName(ByVal workSheetName As String)
     Dim ws As Worksheet
     Dim isWorkSheetNameFlg As Boolean
     For Each ws In Worksheets
-        If UCase(ws.Name) = UCase(WorkSheetName) Then
+        If UCase(ws.Name) = UCase(workSheetName) Then
             isWorkSheetNameFlg = True
         End If
     Next ws
     IsWorkSheetName = isWorkSheetNameFlg
 End Function
+
+Function DeleteIllegalChar(ByVal srcText As String) As String
+    Dim ArrIllegalCharList
+    ArrIllegalCharList = Split("',’,＇,*,:,?,\,￥,＊,／,：,？,[,［,］,],＼,/,<,>", ",")
+    Dim illegalChar
+    For Each illegalChar In ArrIllegalCharList
+        srcText = Replace(srcText, illegalChar, "")
+    Next
+    DeleteIllegalChar = srcText
+End Function
+
