@@ -57,7 +57,7 @@ Sub Execute(ByVal TableName As String, ByVal IsColumn As Boolean, ByVal IsTableU
     
     '// 結果出力ワークシート名
     Dim resultWorkSheetName As String
-    resultWorkSheetName = TableName & "_" & "I"
+    resultWorkSheetName = TableName & "_" & "X"
        
     '// シート名存在チェック
     Dim isWorkSheetNameFlg As Boolean
